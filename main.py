@@ -92,7 +92,7 @@ async def send_pinned_ad(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
 
     ad_text = "🔥 Want to make money online? Click the link below 👇\n[Ad] Earn from home 💸"
-    ad_url = "http://bit.ly/3IzC8lI" 
+    ad_url = "https://www.profitableratecpm.com/q3kdk49ih?key=06f9eb9a496c602b5b0e39cba2d700cd" 
 
     #  Inline button
     keyboard = InlineKeyboardMarkup([
