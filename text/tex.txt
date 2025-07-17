@@ -1,0 +1,7 @@
+if file_path and os.path.exists(file_path):
+        await update.message.reply_chat_action(action="upload_video")
+        with open(file_path, 'rb') as video:
+            await update.message.reply_video(video)
+        os.remove(file_path)  # optional: clean up file
+    else:
+        await update.message.reply_text("Download failed. Please try another link.")
