@@ -141,7 +141,7 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
     #checking if the audio command was used 
     if '@toaudio' in link:
         link = link.replace('@toaudio', '').strip()
-        link = link.replace(' ', '').strip()
+        link = link.replace('@toaudio', '').strip()
         file_path = handle_audio_response(link)
         if file_path and os.path.exists(file_path):
             try:
