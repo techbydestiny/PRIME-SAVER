@@ -5,7 +5,7 @@ from telegram import Update
 from telegram.ext import Application, MessageHandler, CommandHandler, filters, ContextTypes
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.constants import ParseMode
-from utiis import Operator
+from utiis import download_video , download_audio
 
 load_dotenv()
 
@@ -119,8 +119,11 @@ async def send_pinned_ad(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 #responses
-def handle_response(link: str) -> str:
-   return Operator(link)
+def handle_video_response(link: str) -> str:
+   return download_video(link)
+
+def handle_audio_response(link: str) -> str:
+    return download_audio(link)
 
 
 async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -129,32 +132,55 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     print(f"{update.message.chat.id} in {message_type}: {link}")
 
+    #checking if the message was sent in a group and removing the bot name if it was tagged
     if message_type == 'group' and BOT_USERNAME in link:
         link = link.replace(BOT_USERNAME, '').strip()
     else:
         link = link
 
-    file_path = handle_response(link)
+    #checking if the audio command was used 
+    if '@toaudio' in link:
+        link = link.replace('@toaudio', '').strip()
+        link = link.replace(' ', '').strip()
+        file_path = handle_audio_response(link)
+        if file_path and os.path.exists(file_path):
+            try:
+                with open(file_path, 'rb') as audio:
+                    await context.bot.send_audio(
+                            chat_id=update.message.chat_id,
+                            audio=audio,
+                            reply_to_message_id=update.message.message_id,
+                            caption="This is the audio")
+                          
+            except Exception as e:
+                await context.bot.send_message(
+                    chat_id=update.message.chat_id,
+                    text=f"❌ Couldn't send the video: {e}",
+                    reply_to_message_id=update.message.message_id
+                )
+            finally:
+                os.remove(file_path)
+    else:
+        file_path = handle_video_response(link)
 
-    if file_path and os.path.exists(file_path):
-        try:
-            with open(file_path, 'rb') as video:
-                await context.bot.send_video(
-                        chat_id=update.message.chat_id,
-                        video=video,
-                        reply_to_message_id=update.message.message_id)
-        except Exception as e:
-            await context.bot.send_message(
-                chat_id=update.message.chat_id,
-                text=f"❌ Couldn't send the video: {e}",
-                reply_to_message_id=update.message.message_id
-            )
-        finally:
-            os.remove(file_path)
+        if file_path and os.path.exists(file_path):
+            try:
+                with open(file_path, 'rb') as video:
+                    await context.bot.send_video(
+                            chat_id=update.message.chat_id,
+                            video=video,
+                            reply_to_message_id=update.message.message_id)
+            except Exception as e:
+                await context.bot.send_message(
+                    chat_id=update.message.chat_id,
+                    text=f"❌ Couldn't send the video: {e}",
+                    reply_to_message_id=update.message.message_id
+                )
+            finally:
+                os.remove(file_path)
                      
 async def error(update:Update, context: ContextTypes.DEFAULT_TYPE):
     print(f"{context.error}, was made")
-
 
 
 if __name__ == '__main__' :
