@@ -5,8 +5,6 @@ import yt_dlp
 from yt_dlp import YoutubeDL
 import re
 
-ffmpeg_path = os.path.abspath("ffmpeg")
-
 def sanitize_filename(name):
     return re.sub(r'[^\w\-_.]', '', name).replace(" ", "")
 
@@ -53,7 +51,6 @@ def download_audio(link):
                     'outtmpl': output_path.strip(),
                     'quiet': True,
                     'noplaylist': True,
-                    'ffmpeg_location': ffmpeg_path,
                     'postprocessors': [{
                         'key': 'FFmpegExtractAudio',
                         'preferredcodec': 'mp3',
